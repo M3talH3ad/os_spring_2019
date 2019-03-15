@@ -70,12 +70,9 @@ runcmd(struct cmd *cmd)
   case '>':
   case '<':
     rcmd = (struct redircmd*)cmd;
-    // close(rcmd->fd);
-
-    // fprintf(stderr, "redir not implemented\n");
     // Your code here ...
 
-    int new_fd = open(rcmd->file, rcmd->mode);
+    int new_fd = open(rcmd->file, rcmd->mode, 0700);
     if( new_fd < 0){
       fprintf(stdout, "opening %s file failed\n", rcmd->file);
       exit(0);
@@ -102,10 +99,10 @@ runcmd(struct cmd *cmd)
 
     // Parent
     if(ped > (pid_t) 0){
+      // close input of parent process
       close(0);
       dup(p[0]);
       wait(NULL);
-      // close(p[0]);
       close(p[1]);
       runcmd(pcmd->right);
 
@@ -115,11 +112,8 @@ runcmd(struct cmd *cmd)
       // close ouput of child process
       close(1);
       dup(p[1]);
-      // close(p[0]);
-      close(p[0]);
       runcmd(pcmd->left);
     }
-    // Your code here ...
     break;
   }    
   exit(0);
